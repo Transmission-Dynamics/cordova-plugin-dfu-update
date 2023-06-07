@@ -1,4 +1,4 @@
-declare module "cordova-plugin-dfu-update" {
+declare module "@Transmission-Dynamics/cordova-plugin-dfu-update" {
   export interface Progress {
     percent: number;
     speed: number;
