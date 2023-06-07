@@ -1,4 +1,5 @@
 /// <reference path="../interfaces/status.d.ts" />
+/// <reference path="../interfaces/progress.d.ts" />
 
 declare module "@Transmission-Dynamics/cordova-plugin-dfu-update" {
   export type Result =
