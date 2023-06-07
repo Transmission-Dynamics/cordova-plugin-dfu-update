@@ -99,54 +99,61 @@ import iOSDFULibrary
     }
 
     func startUpgrade(deviceId: String, url: URL, packetReceiptNotificationsValue: NSInteger) -> CDVPluginResult {
-        let selectedFirmware = DFUFirmware(urlToZipFile: url)
+        do {
+            let selectedFirmware = try DFUFirmware(urlToZipFile: url)
 
-        if (selectedFirmware == nil || !(selectedFirmware?.valid ?? true)) {
+            if (!selectedFirmware.valid) {
+                return CDVPluginResult(
+                    status: CDVCommandStatus_ERROR,
+                    messageAs: "Invalid firmware"
+                )
+            }
+
+            let deviceUUID = UUID.init(uuidString: deviceId) ?? nil
+
+            if (deviceUUID == nil) {
+                return CDVPluginResult(
+                    status: CDVCommandStatus_ERROR,
+                    messageAs: "Address " + deviceId + " is not a valid UUID"
+                )
+            }
+
+            let peripherals = manager.retrievePeripherals(withIdentifiers: [deviceUUID!])
+            if (peripherals.count < 1) {
+                return CDVPluginResult(
+                    status: CDVCommandStatus_ERROR,
+                    messageAs: "Device with address " + deviceId + " not found"
+                )
+            }
+
+            let deviceP = peripherals[0];
+
+            //let initiator = DFUServiceInitiator(target: deviceP).with(firmware: selectedFirmware!)
+            let initiator = DFUServiceInitiator(queue: DispatchQueue(label: "Other"))
+
+            initiator.enableUnsafeExperimentalButtonlessServiceInSecureDfu = true
+            initiator.packetReceiptNotificationParameter = UInt16(packetReceiptNotificationsValue)
+            initiator.forceDfu = false
+            initiator.delegate = self
+            initiator.progressDelegate = self
+
+            //dfuController = initiator.start()!
+            dfuController = initiator.with(firmware: selectedFirmware).start(target: deviceP)
+
+            let pluginResult = CDVPluginResult(
+                status: CDVCommandStatus_OK,
+                messageAs: deviceId + ":" + url.absoluteString
+            )
+
+            pluginResult?.setKeepCallbackAs(true)
+
+            return pluginResult!
+        } catch {
             return CDVPluginResult(
                 status: CDVCommandStatus_ERROR,
-                messageAs: "Invalid firmware"
+                messageAs: error.localizedDescription
             )
         }
-
-        let deviceUUID = UUID.init(uuidString: deviceId) ?? nil
-
-        if (deviceUUID == nil) {
-            return CDVPluginResult(
-                status: CDVCommandStatus_ERROR,
-                messageAs: "Address " + deviceId + " is not a valid UUID"
-            )
-        }
-
-        let peripherals = manager.retrievePeripherals(withIdentifiers: [deviceUUID!])
-        if (peripherals.count < 1) {
-            return CDVPluginResult(
-                status: CDVCommandStatus_ERROR,
-                messageAs: "Device with address " + deviceId + " not found"
-            )
-        }
-
-        let deviceP = peripherals[0];
-
-        //let initiator = DFUServiceInitiator(target: deviceP).with(firmware: selectedFirmware!)
-        let initiator = DFUServiceInitiator(queue: DispatchQueue(label: "Other"))
-
-        initiator.enableUnsafeExperimentalButtonlessServiceInSecureDfu = true
-        initiator.packetReceiptNotificationParameter = UInt16(packetReceiptNotificationsValue)
-        initiator.forceDfu = false
-        initiator.delegate = self
-        initiator.progressDelegate = self
-
-        //dfuController = initiator.start()!
-        dfuController = initiator.with(firmware: selectedFirmware!).start(target: deviceP)
-
-        let pluginResult = CDVPluginResult(
-            status: CDVCommandStatus_OK,
-            messageAs: deviceId + ":" + url.absoluteString
-        )
-
-        pluginResult?.setKeepCallbackAs(true)
-
-        return pluginResult!
     }
 
     func dfuStateDidChange(to state: DFUState) {
