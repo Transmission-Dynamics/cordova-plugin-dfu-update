@@ -1,6 +1,6 @@
 {
-  "version": "1.4.1",
-  "name": "cordova-plugin-dfu-update",
+  "version": "1.4.1-td.1",
+  "name": "@Transmission-Dynamics/cordova-plugin-dfu-update",
   "description": "Use Nordic Semiconductor's Device Firmware Update (DFU) service to update a Bluetooth LE device",
   "devDependencies": {
     "@commitlint/config-conventional": "13.2.0",
@@ -44,5 +44,8 @@
   "bugs": {
     "url": "https://github.com/EinfachHans/cordova-plugin-dfu-update/issues"
   },
-  "homepage": "https://github.com/EinfachHans/cordova-plugin-dfu-update.git"
+  "homepage": "https://github.com/EinfachHans/cordova-plugin-dfu-update.git",
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/@Transmission-Dynamics"
+  }
 }
