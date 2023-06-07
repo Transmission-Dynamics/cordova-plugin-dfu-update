@@ -1,5 +1,6 @@
+/// <reference path="./interfaces/result.d.ts" />
+/// <reference path="./interfaces/error.d.ts" />
 /// <reference path="./interfaces/update-options.d.ts" />
-
 declare module "@Transmission-Dynamics/cordova-plugin-dfu-update" {
   export default class DfuUpdate {
     static updateFirmware(
