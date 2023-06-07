@@ -1,5 +1,5 @@
 {
-  "version": "1.4.1-td.4",
+  "version": "1.4.1-td.5",
   "name": "@Transmission-Dynamics/cordova-plugin-dfu-update",
   "description": "Use Nordic Semiconductor's Device Firmware Update (DFU) service to update a Bluetooth LE device",
   "devDependencies": {
